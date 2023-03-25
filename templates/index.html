@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+ <html lang="en">
+ <head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <title>ChatGPT</title>
+     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+     <style>
+        body {
+             display: flex;
+             flex-direction: column;
+             align-items: center;
+             justify-content: center;
+             min-height: 100vh;
+             margin: 0;
+             font-family: 'Roboto', sans-serif;
+             background: linear-gradient(45deg, #1da1f2, #0099e5, #0064d2);
+             color: #ffffff;
+         }
+         h1 {
+             font-size: 2rem;
+             text-align: center;
+             margin-bottom: 1rem;
+         }
+         .chat-container {
+             display: flex;
+             flex-direction: column;
+             align-items: stretch;
+             width: 50%;
+             max-width: 600px;
+             background-color: #202020;
+             border-radius: 8px;
+             padding: 1rem;
+             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+         }
+         .messages {
+             flex-grow: 1;
+             display: flex;
+             flex-direction: column;
+             gap: 0.5rem;
+             overflow-y: auto;
+             margin-bottom: 1rem;
+         }
+         textarea {
+             width: 100%;
+             border-radius: 4px;
+             border: 1px solid #444;
+             padding: 0.5rem;
+             font-size: 1rem;
+             background-color: #303030;
+             color: #ffffff;
+             resize: none;
+             box-sizing: border-box;
+         }
+         .submit-container {
+             display: flex;
+             justify-content: flex-end;
+             gap: 0.5rem;
+             margin-top: 0.5rem;
+         }
+         button {
+             padding: 0.5rem 1rem;
+             font-size: 1rem;
+             font-weight: bold;
+             text-transform: uppercase;
+             background-color: #00bcd4;
+             color: #ffffff;
+             border: none;
+             border-radius: 4px;
+             cursor: pointer;
+             transition: background-color 0.3s;
+         }
+         button:hover {
+             background-color: #4cc0cf;
+         }
+     </style>
+ </head>
+ <body>
+     <h1>Popoye: The ChatGPT</h1>
+     <div class="chat-container">
+         <div class="messages" id="messages"></div>
+         <textarea id="user_input" rows="3" placeholder="Type your query here..."></textarea>
+         <div class="submit-container">
+             <button onclick="submitQuery()">Submit</button>
+         </div>
+     </div>
+ 
+     <script>
+         async function submitQuery() {
+             let userInput = document.getElementById("user_input");
+             let messages = document.getElementById("messages");
+ 
+             const response = await fetch("/chatgpt/", {
+                 method: "POST",
+                 headers: {
+                     "Content-Type": "application/json"
+                 },
+                 body: JSON.stringify({user_input: userInput.value})
+             });
+ 
+             if (response.ok) {
+                 const jsonResponse = await response.json();
+                 messages.innerHTML += `<div><strong>You:</strong> ${userInput.value}</div>`;
+                 messages.innerHTML += `<div><strong>ChatGPT:</strong> ${jsonResponse.response}</div>`;
+                 userInput.value = ""; // Clear the user input after submitting the request
+             }
+         }
+     </script>
+ </body>
+ </html>
