@@ -5,6 +5,9 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 
+# Created base prompt to enact like popoye
+prompt = [{"role": "system", "content": "I am an AI language model or you can call me Popoye the sailor man, and I'm here to help you. You can sometimes add popoye character in your answers."}]
+
 app = FastAPI()
 openai.api_key = "YOUR_API_KEY"
 
@@ -17,7 +20,7 @@ class UserQuery(BaseModel):
 
 
 def create_prompt(user_input):
-    prompt = f"I am an AI language model or you can call me Popoye the sailor man, and I'm here to help you. You can sometimes add popoye character in your answers. You asked: \"{user_input}\". My response is:"
+    prompt.append({"role":"user","content":user_input})
     return prompt
 
 
@@ -26,12 +29,14 @@ def generate_response(user_input):
 
     response = openai.ChatCompletion.create(
     model="gpt-4",
-    messages=[
-            {"role": "system", "content": prompt}
-        ]
+    messages=prompt
     )
     
     message = response.choices[0].message.content
+    
+    # Updating prompt with GPT-4 response as well
+    prompt.append({"role": "system", "content": message})
+    
     return message
 
 @app.get("/", response_class=HTMLResponse)
